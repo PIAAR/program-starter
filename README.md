@@ -172,6 +172,34 @@ npm install
 npm start
 ```
 
+## Roadmap / next steps
+
+Status as of the last working session — pick up here:
+
+- [ ] **Publish to npm.** The package isn't published yet, so `install.sh`/
+      `install.ps1` clone the repo via git instead of using `npx
+      program-starter`. Once published, swap the installers and README Quick
+      Start back to the `npx` form. This is a one-way, externally-visible
+      action (public package name; npm's unpublish window is only 72 hours)
+      — worth a deliberate go/no-go, not a reflexive default.
+- [ ] **Wire up CI.** No automated checks exist yet beyond GitHub's default
+      Dependabot workflow. At minimum: `node --check` across `src/` and
+      every template, plus a scripted scaffold-and-verify pass per template
+      (what the manual pty-driven test session did by hand — see git log for
+      `install.sh`/Postgres-identifier fixes that test caught).
+- [ ] **Disk-space-aware optional downloads.** Original ask was whether to
+      offer GitHub Desktop / Docker / DB installer downloads. Decision so
+      far: detect-only, never auto-install GUI apps or system services (see
+      "What gets auto-installed" above). If you still want an opt-in,
+      off-by-default flow that checks disk space before offering those
+      downloads, `src/detect.js` is the extension point.
+- [ ] **Dependabot findings.** GitHub flagged ~17 vulnerabilities on push,
+      traced to version *ranges* declared in template `package.json` files
+      (e.g. `next@^14.2.0`), not the CLI's own installed deps (`npm audit`
+      on the root package is clean). Left alone deliberately since a fresh
+      `npm install` pulls current patches within range — revisit if you want
+      to bump template floor versions explicitly.
+
 ## License
 
 MIT
