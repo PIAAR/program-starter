@@ -19,6 +19,9 @@ ongoing dependency of the project itself.
 
 ## Quick start
 
+Run this from the directory where you want your **new project** to be
+created (e.g. `~/code`), not from inside an existing project:
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/PIAAR/program-starter/main/install.sh | bash
 ```
@@ -29,12 +32,75 @@ Windows (PowerShell):
 irm https://raw.githubusercontent.com/PIAAR/program-starter/main/install.ps1 | iex
 ```
 
-This installs Git/Node/Conda if missing, then launches the interactive CLI.
-If you already have those three, you can skip straight to:
+This installs Git/Node/Conda if missing, clones `program-starter` into
+`~/.program-starter` (reused and `git pull`-ed on future runs), then launches
+the interactive CLI from *your current directory* — so the project it
+scaffolds lands next to you, not inside the tool's own install folder.
 
-```bash
-npx program-starter
+> **Note:** `program-starter` isn't published to npm yet, so there's no
+> `npx program-starter` shortcut yet — the installer scripts above are
+> currently the only supported entry point. If you already have Git/Node/Conda
+> and just want to run it directly:
+> ```bash
+> git clone https://github.com/PIAAR/program-starter.git ~/.program-starter
+> cd ~/.program-starter && npm install
+> cd /path/to/where/you/want/your/new/project
+> node ~/.program-starter/bin/program-starter.js
+> ```
+
+## Walkthrough
+
+A run looks like this:
+
 ```
+$ program-starter
+
+program-starter — spin up a new project the right way
+
+Environment check
+  git      ✔ git version 2.43.0
+  node     ✔ v22.22.2
+  npm      ✔ 10.9.7
+  conda    ✘ not found
+  python   ✔ Python 3.11.15
+  gh       ✘ not found
+  doppler  ✘ not found
+  docker   ✔ Docker version 29.3.1
+
+? What do you want to build?
+  > SaaS / API backend (Node + Express)
+
+? Project name: my-app
+
+? Run setup commands now? (npm install)  Yes
+
+? Initialize a git repository?  Yes
+
+? Add a docker-compose.yml with Postgres + Redis for local dev?  Yes
+
+Done. cd my-app and start building.
+```
+
+Steps that are skipped automatically (rather than shown as a question) when
+the relevant tool isn't installed or authenticated: creating a GitHub repo
+(needs `gh auth login`) and linking a Doppler project (needs `doppler
+login`). The CLI tells you which one and where to get it — it never blocks
+on a tool you don't have.
+
+**After it finishes:** `cd` into the new project directory and follow *that
+project's own* `README.md` — each template ships one with its exact next
+commands (e.g. `docker compose up -d && npm run dev`).
+
+### Troubleshooting
+
+- `TTY initialization failed`: you're running in a non-interactive shell
+  (CI, a piped command, some remote sessions). The CLI needs a real
+  terminal for its interactive menu — run it in an actual terminal window.
+- GitHub repo creation silently skipped: run `gh auth login` first, then
+  re-run program-starter (or just `gh repo create` manually inside the
+  scaffolded project).
+- Doppler setup silently skipped: run `doppler login` first, then re-run
+  program-starter (or `doppler setup` manually inside the project).
 
 ## What the CLI does
 

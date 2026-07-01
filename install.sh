@@ -40,5 +40,15 @@ else
   log "Conda found: $(conda --version)"
 fi
 
-log "Core environment ready. Launching the project setup CLI..."
-npx --yes program-starter@latest
+log "Core environment ready. Fetching program-starter..."
+PROJECT_DIR="$(pwd)"
+INSTALL_DIR="${PROGRAM_STARTER_DIR:-$HOME/.program-starter}"
+if [ -d "$INSTALL_DIR/.git" ]; then
+  git -C "$INSTALL_DIR" pull --ff-only
+else
+  git clone --depth 1 https://github.com/PIAAR/program-starter.git "$INSTALL_DIR"
+fi
+(cd "$INSTALL_DIR" && npm install --no-audit --no-fund)
+
+log "Launching the project setup CLI in $PROJECT_DIR..."
+(cd "$PROJECT_DIR" && node "$INSTALL_DIR/bin/program-starter.js")
