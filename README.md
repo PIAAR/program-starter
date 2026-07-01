@@ -19,6 +19,9 @@ ongoing dependency of the project itself.
 
 ## Quick start
 
+Run this from the directory where you want your **new project** to be
+created (e.g. `~/code`), not from inside an existing project:
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/PIAAR/program-starter/main/install.sh | bash
 ```
@@ -29,12 +32,75 @@ Windows (PowerShell):
 irm https://raw.githubusercontent.com/PIAAR/program-starter/main/install.ps1 | iex
 ```
 
-This installs Git/Node/Conda if missing, then launches the interactive CLI.
-If you already have those three, you can skip straight to:
+This installs Git/Node/Conda if missing, clones `program-starter` into
+`~/.program-starter` (reused and `git pull`-ed on future runs), then launches
+the interactive CLI from *your current directory* — so the project it
+scaffolds lands next to you, not inside the tool's own install folder.
 
-```bash
-npx program-starter
+> **Note:** `program-starter` isn't published to npm yet, so there's no
+> `npx program-starter` shortcut yet — the installer scripts above are
+> currently the only supported entry point. If you already have Git/Node/Conda
+> and just want to run it directly:
+> ```bash
+> git clone https://github.com/PIAAR/program-starter.git ~/.program-starter
+> cd ~/.program-starter && npm install
+> cd /path/to/where/you/want/your/new/project
+> node ~/.program-starter/bin/program-starter.js
+> ```
+
+## Walkthrough
+
+A run looks like this:
+
 ```
+$ program-starter
+
+program-starter — spin up a new project the right way
+
+Environment check
+  git      ✔ git version 2.43.0
+  node     ✔ v22.22.2
+  npm      ✔ 10.9.7
+  conda    ✘ not found
+  python   ✔ Python 3.11.15
+  gh       ✘ not found
+  doppler  ✘ not found
+  docker   ✔ Docker version 29.3.1
+
+? What do you want to build?
+  > SaaS / API backend (Node + Express)
+
+? Project name: my-app
+
+? Run setup commands now? (npm install)  Yes
+
+? Initialize a git repository?  Yes
+
+? Add a docker-compose.yml with Postgres + Redis for local dev?  Yes
+
+Done. cd my-app and start building.
+```
+
+Steps that are skipped automatically (rather than shown as a question) when
+the relevant tool isn't installed or authenticated: creating a GitHub repo
+(needs `gh auth login`) and linking a Doppler project (needs `doppler
+login`). The CLI tells you which one and where to get it — it never blocks
+on a tool you don't have.
+
+**After it finishes:** `cd` into the new project directory and follow *that
+project's own* `README.md` — each template ships one with its exact next
+commands (e.g. `docker compose up -d && npm run dev`).
+
+### Troubleshooting
+
+- `TTY initialization failed`: you're running in a non-interactive shell
+  (CI, a piped command, some remote sessions). The CLI needs a real
+  terminal for its interactive menu — run it in an actual terminal window.
+- GitHub repo creation silently skipped: run `gh auth login` first, then
+  re-run program-starter (or just `gh repo create` manually inside the
+  scaffolded project).
+- Doppler setup silently skipped: run `doppler login` first, then re-run
+  program-starter (or `doppler setup` manually inside the project).
 
 ## What the CLI does
 
@@ -105,6 +171,34 @@ template means adding a directory here and one entry in `src/templates.js`.
 npm install
 npm start
 ```
+
+## Roadmap / next steps
+
+Status as of the last working session — pick up here:
+
+- [ ] **Publish to npm.** The package isn't published yet, so `install.sh`/
+      `install.ps1` clone the repo via git instead of using `npx
+      program-starter`. Once published, swap the installers and README Quick
+      Start back to the `npx` form. This is a one-way, externally-visible
+      action (public package name; npm's unpublish window is only 72 hours)
+      — worth a deliberate go/no-go, not a reflexive default.
+- [ ] **Wire up CI.** No automated checks exist yet beyond GitHub's default
+      Dependabot workflow. At minimum: `node --check` across `src/` and
+      every template, plus a scripted scaffold-and-verify pass per template
+      (what the manual pty-driven test session did by hand — see git log for
+      `install.sh`/Postgres-identifier fixes that test caught).
+- [ ] **Disk-space-aware optional downloads.** Original ask was whether to
+      offer GitHub Desktop / Docker / DB installer downloads. Decision so
+      far: detect-only, never auto-install GUI apps or system services (see
+      "What gets auto-installed" above). If you still want an opt-in,
+      off-by-default flow that checks disk space before offering those
+      downloads, `src/detect.js` is the extension point.
+- [ ] **Dependabot findings.** GitHub flagged ~17 vulnerabilities on push,
+      traced to version *ranges* declared in template `package.json` files
+      (e.g. `next@^14.2.0`), not the CLI's own installed deps (`npm audit`
+      on the root package is clean). Left alone deliberately since a fresh
+      `npm install` pulls current patches within range — revisit if you want
+      to bump template floor versions explicitly.
 
 ## License
 

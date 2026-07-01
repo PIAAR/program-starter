@@ -28,5 +28,19 @@ if (-not (Test-CommandExists conda)) {
     Write-Host "[program-starter] Conda found: $(conda --version)"
 }
 
-Write-Host "[program-starter] Core environment ready. Launching the project setup CLI..."
-npx --yes program-starter@latest
+Write-Host "[program-starter] Core environment ready. Fetching program-starter..."
+$ProjectDir = Get-Location
+$InstallDir = if ($env:PROGRAM_STARTER_DIR) { $env:PROGRAM_STARTER_DIR } else { Join-Path $env:USERPROFILE ".program-starter" }
+if (Test-Path (Join-Path $InstallDir ".git")) {
+    git -C $InstallDir pull --ff-only
+} else {
+    git clone --depth 1 https://github.com/PIAAR/program-starter.git $InstallDir
+}
+Push-Location $InstallDir
+npm install --no-audit --no-fund
+Pop-Location
+
+Write-Host "[program-starter] Launching the project setup CLI in $ProjectDir..."
+Push-Location $ProjectDir
+node (Join-Path $InstallDir "bin/program-starter.js")
+Pop-Location
