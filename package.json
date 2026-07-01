@@ -1,0 +1,28 @@
+{
+  "name": "program-starter",
+  "version": "0.1.0",
+  "description": "Interactive terminal installer that sets up a developer's local environment (Conda, Node, Git, GitHub, Doppler) and scaffolds a new project from a modern starting template.",
+  "type": "module",
+  "bin": {
+    "program-starter": "./bin/program-starter.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node ./bin/program-starter.js"
+  },
+  "files": [
+    "bin",
+    "src"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/PIAAR/program-starter.git"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.7.0",
+    "fs-extra": "^11.2.0"
+  }
+}
